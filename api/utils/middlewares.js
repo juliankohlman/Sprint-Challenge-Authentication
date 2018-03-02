@@ -35,32 +35,31 @@ const encryptUserPW = (req, res, next) => {
 };
 
 const compareUserPW = (req, res, next) => {
-  const { username, password } = req.body;
+  let { username, password } = req.body;
   // https://github.com/kelektiv/node.bcrypt.js#usage TODO: Fill this middleware in with the Proper
   // password comparing, bcrypt.compare() You'll need to find the user in your DB Once you have the
   // user, you'll need to pass the encrypted pw and the plaintext pw to the compare function If the
   // passwords match set the username on `req` ==> req.username = user.username; and call next();
-  User.find({ username }), (err, user) => {
+  User.findOne({ username }, (err, user) => {
     if (err) {
-      res.status(500).json({ error: 'Invalid Username or Password provided.'});
-      // next();
+      res.status(500).json({ error: 'Invalid Username/Password' });
       return;
     }
-    // if (user === null) {
-    //   res.status(422).json({ error: `User ${username} not found in Database.`})
-    //   // return;
-    // }
-    // bcrypt.compare(password, user.password, (err, doesMatch) => {
-    //   if (err) {
-    //     res.status(422).json({ error: 'non-matching passwords'})
-    //     // return;
-    //   }
-    //   if (doesMatch) {
-    //     req.username = user.username;
-    //   }
-    //   next();
-    // })
-  }
+    if (user === null) {
+      res.status(422).json({ error: 'No user with that username in our DB' });
+      return;
+    }
+    user.checkPassword(password, (nonMatch, hashMatch) => {
+      if (nonMatch !== null) {
+        res.status(422).json({ error: 'passwords dont match' });
+        return;
+      }
+      if (hashMatch) {
+        req.username = user.username;
+        next();
+      }
+    });
+  });
 };
 
 module.exports = {
