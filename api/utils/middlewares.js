@@ -49,12 +49,12 @@ const compareUserPW = (req, res, next) => {
       res.status(422).json({ error: 'No user with that username in our DB' });
       return;
     }
-    user.checkPassword(password, (err, matchingHash) => {
-      if (err !== null) {
-        res.status(401).json({ error: "The passwords don't match." });
+    user.checkPassword(password, (nonMatch, hashMatch) => {
+      if (nonMatch) {
+        res.status(401).json({ error: 'The passwords do not match.' });
         return;
       }
-      if (matchingHash) {
+      if (hashMatch) {
         req.username = user.username;
         next();
       }

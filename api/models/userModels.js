@@ -16,8 +16,8 @@ const UserSchema = Schema({
   }
 });
 
-UserSchema.methods.checkPassword = function(potentialPassword, cb) {
-  bcrypt.compare(potentialPassword, this.password, (err, isMatch) => {
+UserSchema.methods.checkPassword = function(attemptedPswd, cb) {
+  bcrypt.compare(attemptedPswd, this.password, (err, isMatch) => {
     if (err) return cb(err);
     cb(null, isMatch);
   });
