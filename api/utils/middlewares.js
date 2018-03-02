@@ -51,7 +51,7 @@ const compareUserPW = (req, res, next) => {
     }
     user.checkPassword(password, (nonMatch, hashMatch) => {
       if (nonMatch !== null) {
-        res.status(422).json({ error: 'passwords dont match' });
+        res.status(422).json({ error: "The passwords don't match." });
         return;
       }
       if (hashMatch) {
